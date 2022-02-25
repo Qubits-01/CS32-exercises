@@ -50,9 +50,16 @@ bool checkAnagram(char str1[], char str2[]) {
 
     i = 0;
 
-    while (str2[i] != '\0') {
-        charCount2[tolower(str2[i]) - 'a']++;
-        i++;
+    while (str1[i] != '\0') {
+        char char_temp = tolower(str2[i]);
+        isInEnglishAlphabet = isInAlphabet(char_temp, englishAlphabet);
+
+        if (isInEnglishAlphabet) {
+            charCount2[char_temp - 'a']++;
+            i++;
+        } else {
+            continue;
+        }
     }
 
     for (int i = 0; i < 26; i++) {

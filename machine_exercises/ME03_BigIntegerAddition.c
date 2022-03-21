@@ -8,6 +8,14 @@ typedef struct BigInt {
     struct BigInt* rlink;
 } BigInt;
 
+BigInt* char_to_bigint(char *digits, int len) {
+    // 
+}
+
+BigInt* add(BigInt **a_ptr, BigInt **b_prt) {
+    //
+}
+
 int main() {
     BigInt bigint;
     bigint.data = 12;

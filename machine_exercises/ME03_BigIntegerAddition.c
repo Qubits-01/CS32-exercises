@@ -9,18 +9,30 @@ typedef struct BigInt {
     struct BigInt* rlink;
 } BigInt;
 
-
-// Converts an array of characters (where each character is a digit).
-BigInt * char_to_bigint(char *digits, int len) {
-    // zeroInteger
-    BigInt *longInt = NULL;
+void zeroLongInt(BigInt **longInt) {
     BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
-    
+
     tao -> data = 0;
     tao -> llink = tao;
     tao -> rlink = tao;
-    longInt = tao;
-    // *zeroInteger
+
+    *longInt = tao;
+}
+
+void insertAtHead(BigInt *longInt, int term) {
+    BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
+
+    tao -> data = term;
+    tao -> rlink = longInt -> rlink;
+    tao -> llink = longInt;
+    (longInt -> rlink) -> llink = tao;
+    longInt -> rlink = tao;
+}
+
+// Converts an array of characters (where each character is a digit).
+BigInt * char_to_bigint(char *digits, int len) {
+    BigInt *longInt;
+    zeroLongInt(&longInt);
 
     int nTerms = 0;
     int sign = 1;
@@ -29,7 +41,7 @@ BigInt * char_to_bigint(char *digits, int len) {
         int term = digits[i] - '0';  // Converts [char] digit into [int].
 
         // insertAtTail
-        tao = (BigInt *) malloc(sizeof(BigInt));
+        BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
         tao -> data = term;
         (longInt -> llink) -> rlink = tao;
         tao -> rlink = longInt;
@@ -50,15 +62,8 @@ BigInt * add(BigInt **a_ptr, BigInt **b_ptr) {
     BigInt *a = *a_ptr;
     BigInt *b = *b_ptr;
 
-    // zeroInteger
-    BigInt *sum = NULL;
-    BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
-    
-    tao -> data = 0;
-    tao -> llink = tao;
-    tao -> rlink = tao;
-    sum = tao;
-    // *zeroInteger
+    BigInt *sum;
+    zeroLongInt(&sum);
 
     // [k] is number of terms in [sum].
     // [c] is carry.
@@ -83,19 +88,9 @@ BigInt * add(BigInt **a_ptr, BigInt **b_ptr) {
             beta = beta -> llink;
         } else if ((alpha == a) && (beta == b)) {
             if (c != 0) {
-                // insertAtHead
-                BigInt *tao1 = (BigInt *) malloc(sizeof(BigInt));
-                tao1 -> data = c;
-                tao1 -> rlink = sum -> rlink;
-                tao1 -> llink = sum;
-                (sum -> rlink) -> llink = tao1;
-                sum -> rlink = tao1;
-                // *insertAtHead
+                insertAtHead(sum, c);
 
                 k += 1;
-            } else {
-                // deleteLeadingZeroes
-                // *deleteLeadingZeroes
             }
 
             sum -> data = k;
@@ -103,15 +98,8 @@ BigInt * add(BigInt **a_ptr, BigInt **b_ptr) {
         }
 
         int term = t % 10;
-        printf("terms: %d\n", term);
-        // insertAtHead
-        BigInt *tao2 = (BigInt *) malloc(sizeof(BigInt));
-        tao2 -> data = term;
-        tao2 -> rlink = sum -> rlink;
-        tao2 -> llink = sum;
-        (sum -> rlink) -> llink = tao2;
-        sum -> rlink = tao2;
-        // *insertAtHead
+        printf("term: %d\n", term);
+        insertAtHead(sum, term);
 
         c = t / 10;
         k += 1;
@@ -148,8 +136,8 @@ int main() {
     char n3[20] = "92498988047678334552";
     char n4[20] = "96817198892297134829";
 
-    BigInt *a = char_to_bigint(n3, 20);
-    BigInt *b = char_to_bigint(n4, 20);
+    BigInt *a = char_to_bigint(n1, 5);
+    BigInt *b = char_to_bigint(n2, 5);
 
     printElems(a);
     newLine;
@@ -169,17 +157,20 @@ int main() {
 // #include<stdio.h>
 // #include<stdlib.h>
 
+// BigInt * char_to_bigint(char*, int);
+// BigInt * add(BigInt **, BigInt **);
+
+// void zeroLongInt(BigInt **);
+// void insertAtHead(BigInt *, int);
+
+// int main() {
+//     return 0;
+// }
+
 // // Converts an array of characters (where each character is a digit).
 // BigInt * char_to_bigint(char *digits, int len) {
-//     // zeroInteger
-//     BigInt *longInt = NULL;
-//     BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
-    
-//     tao -> data = 0;
-//     tao -> llink = tao;
-//     tao -> rlink = tao;
-//     longInt = tao;
-//     // *zeroInteger
+//     BigInt *longInt;
+//     zeroLongInt(&longInt);
 
 //     int nTerms = 0;
 //     int sign = 1;
@@ -188,7 +179,7 @@ int main() {
 //         int term = digits[i] - '0';  // Converts [char] digit into [int].
 
 //         // insertAtTail
-//         tao = (BigInt *) malloc(sizeof(BigInt));
+//         BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
 //         tao -> data = term;
 //         (longInt -> llink) -> rlink = tao;
 //         tao -> rlink = longInt;
@@ -209,15 +200,8 @@ int main() {
 //     BigInt *a = *a_ptr;
 //     BigInt *b = *b_ptr;
 
-//     // zeroInteger
-//     BigInt *sum = NULL;
-//     BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
-    
-//     tao -> data = 0;
-//     tao -> llink = tao;
-//     tao -> rlink = tao;
-//     sum = tao;
-//     // *zeroInteger
+//     BigInt *sum;
+//     zeroLongInt(&sum);
 
 //     // [k] is number of terms in [sum].
 //     // [c] is carry.
@@ -240,19 +224,9 @@ int main() {
 //             beta = beta -> llink;
 //         } else if ((alpha == a) && (beta == b)) {
 //             if (c != 0) {
-//                 // insertAtHead
-//                 BigInt *tao1 = (BigInt *) malloc(sizeof(BigInt));
-//                 tao1 -> data = c;
-//                 tao1 -> rlink = sum -> rlink;
-//                 tao1 -> llink = sum;
-//                 (sum -> rlink) -> llink = tao1;
-//                 sum -> rlink = tao1;
-//                 // *insertAtHead
+//                 insertAtHead(sum, c);
 
 //                 k += 1;
-//             } else {
-//                 // deleteLeadingZeroes
-//                 // *deleteLeadingZeroes
 //             }
 
 //             sum -> data = k;
@@ -260,14 +234,7 @@ int main() {
 //         }
 
 //         int term = t % 10;
-//         // insertAtHead
-//         BigInt *tao2 = (BigInt *) malloc(sizeof(BigInt));
-//         tao2 -> data = term;
-//         tao2 -> rlink = sum -> rlink;
-//         tao2 -> llink = sum;
-//         (sum -> rlink) -> llink = tao2;
-//         sum -> rlink = tao2;
-//         // *insertAtHead
+//         insertAtHead(sum, term);
 
 //         c = t / 10;
 //         k += 1;
@@ -276,6 +243,22 @@ int main() {
 //     return sum;
 // }
 
-// int main() {
-//     return 0;
+// void zeroLongInt(BigInt **longInt) {
+//     BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
+
+//     tao -> data = 0;
+//     tao -> llink = tao;
+//     tao -> rlink = tao;
+
+//     *longInt = tao;
+// }
+
+// void insertAtHead(BigInt *longInt, int term) {
+//     BigInt *tao = (BigInt *) malloc(sizeof(BigInt));
+
+//     tao -> data = term;
+//     tao -> rlink = longInt -> rlink;
+//     tao -> llink = longInt;
+//     (longInt -> rlink) -> llink = tao;
+//     longInt -> rlink = tao;
 // }

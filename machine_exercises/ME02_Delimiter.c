@@ -1,187 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-typedef char StackElemType;
-typedef struct stacknode StackNode;
+typedef struct Node {
+    int data;
+    struct Node *link;
+} Node;
 
-struct stacknode {
-    StackElemType info;
-    StackNode *link;
-};
+typedef struct Stack {
+    Node *top;
+} Stack;
 
-typedef struct stack Stack;
-struct stack {
-    StackNode *top;
-};
-
-void initStack(Stack *stack) {
-    stack -> top = NULL;
+void initStack(Stack *myStack) {
+    myStack -> top = NULL;
 }
 
-int isEmptyStack(Stack *stack) {
-    return (stack -> top == NULL);
-}
-
-void stackOverflow(void) {
-    printf("Stack overflow detected.\n");
-    exit(1);
-}
-
-void stackUnderflow(void) {
-    printf("Stack underflow detected.\n");
-    exit(1);
-}
-
-void push(Stack *stack, StackElemType x) {
-    StackNode *alpha;
-    alpha = (StackNode *) malloc(sizeof(StackNode));
-
-    if (alpha == NULL) {
-        stackOverflow();
+bool isEmpty(Stack *myStack) {
+    if ((myStack -> top) == NULL) {
+        return true;
     } else {
-        alpha -> info = x;
-        alpha -> link = stack -> top;
-        stack -> top = alpha;
+        return false;
     }
 }
 
-void pop(Stack *stack, StackElemType *x) {
-    if (stack -> top == NULL) {
-        stackUnderflow();
+void push(Stack *myStack, int x) {
+    Node *newNode = (Node *) malloc(sizeof(Node));
+    newNode -> data = x;
+    newNode -> link = NULL;
+
+    if (isEmpty(myStack)) {
+        myStack -> top = newNode;
     } else {
-        StackNode *alpha;
-        alpha = stack -> top;
-        *x = alpha -> info;
-        stack -> top = alpha -> link;
-        free(alpha);
+        newNode -> link = myStack -> top;
+        myStack -> top = newNode;
     }
 }
 
-int main(void) {
-    Stack stack;
-    StackElemType x;
-    char brackets[7] = {'[', ']', '{', '}', '(', ')', '\0'};
+int pop(Stack *myStack) {
+    int popValue;
 
-    initStack(&stack);
-    char testcase1[20] = "{[]}({]";
-    printf("%s\n", testcase1);
+    if (isEmpty(myStack)) {
+        printf("Stack is empty.\n");
+        popValue = -1;
+    } else {
+        Node *toPop = myStack -> top;
+        myStack -> top = toPop -> link;
 
-    int i = 0;
-    int first_opening = 1;
-    int isEnd = 0;
-
-    while (i < strlen(testcase1)) {
-        // printf("%c %d\n", testcase1[i], i);
-        if (isEnd == 1) break;
-
-        int j = 0;
-        while (brackets[j] != '\0') {
-            // printf("%c", closings[j]);
-            if (testcase1[i] == brackets[j]) {
-                // printf("w %c\n", brackets[j]);
-                break;
-            }
-
-            j++;
-        }
-
-        if (j == 6) {
-            i++;
-            continue;
-        }
-
-        if (j % 2 != 0) {
-            if (isEmptyStack(&stack)) {
-                printf("%d\n", i + 1);
-                isEnd = 1;
-                break;
-            }
-
-            pop(&stack, &x);
-
-            if (isEmptyStack(&stack)) {
-                first_opening = i + 2;
-            }
-
-            if (x != brackets[j - 1]) {
-                printf("%d\n", i + 1);
-                isEnd = 1;
-                break;
-            }
-        } else {
-            push(&stack, testcase1[i]);
-        }
-        i++;
+        popValue = toPop -> data;
+        free(toPop);
     }
 
-    if (isEnd != 1) {
-        if (isEmptyStack(&stack)) {
-            printf("Success\n");
-        } else {
-            printf("%d\n", first_opening);
+    return popValue;
+}
+
+void printElems(Stack *myStack) {
+    if (isEmpty(myStack)) {
+        printf("Stack is empty.\n");
+    } else {
+        Node *alpha = myStack -> top;
+
+        while ((alpha -> link) != NULL) {
+            printf("%d ", alpha -> data);
+            alpha = alpha -> link;
         }
+        printf("%d\n", alpha -> data);
     }
+}
+
+int main() {
+    Stack myStack;
+    Stack *ptrMyStack = &myStack;
+    initStack(ptrMyStack);
+
+    push(ptrMyStack, 1);
+    push(ptrMyStack, 12);
+    push(ptrMyStack, 1);
+    push(ptrMyStack, 57);
+    pop(ptrMyStack);
+    pop(ptrMyStack);
+    
+    printElems(ptrMyStack);
 
     return 0;
-
-    // Stack stack;
-    // StackElemType x;
-    // char brackets[7] = {'[', ']', '{', '}', '(', ')', '\0'};
-
-    // initStack(&stack);
-    // char testcase1[100001];
-
-    // while (scanf("%s", testcase1) && (testcase1[0] != '\0')) {
-    //     int i = 0;
-    //     int first_opening = 1;
-    //     int isEnd = 0;
-
-    //     while (i < strlen(testcase1)) {
-    //         if (isEnd == 1) break;
-
-    //         int j = 0;
-    //         while (brackets[j] != '\0') {
-    //             if (testcase1[i] == brackets[j]) break;
-    //             j++;
-    //         }
-
-    //         if (j == 6) {
-    //             i++;
-    //             continue;
-    //         }
-
-    //         if (j % 2 != 0) {
-    //             if (isEmptyStack(&stack)) {
-    //                 printf("%d\n", i + 1);
-    //                 isEnd = 1;
-    //                 break;
-    //             }
-
-    //             pop(&stack, &x);
-
-    //             if (isEmptyStack(&stack)) {
-    //                 first_opening = i + 2;
-    //             }
-
-    //             if (x != brackets[j - 1]) {
-    //                 printf("%d\n", i + 1);
-    //                 isEnd = 1;
-    //                 break;
-    //             }
-    //         } else {
-    //             push(&stack, testcase1[i]);
-    //         }
-    //         i++;
-    //     }
-
-    //     if (isEnd != 1) {
-    //         if (isEmptyStack(&stack)) {
-    //             printf("Success\n");
-    //         } else {
-    //             printf("%d\n", first_opening);
-    //         }
-    //     }
-    // }
-    
-    // return 0;
 }

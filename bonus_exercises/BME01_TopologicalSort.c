@@ -241,9 +241,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-// Queue Linked-List Implementation
 typedef struct qNode {
     int data;
     struct qNode *link;
@@ -254,50 +252,26 @@ typedef struct Queue {
     qNode *rear;
 } Queue;
 
-void initQueue(Queue *myQueue) {
-    myQueue -> front = NULL;
-    myQueue -> rear = NULL;
-}
-
-int isEmpty(Queue *myQueue) {
-    return (myQueue -> front == NULL);
-}
-
-void enqueue(Queue *myQueue, int x) {
-    qNode *alpha = (qNode *) malloc(sizeof(qNode));
-    alpha -> data = x;
-    alpha -> link = NULL;
-
-    if ((myQueue -> front) == NULL) {
-        myQueue -> front = alpha;
-        myQueue -> rear = alpha;
-    } else {
-        (myQueue -> rear) -> link = alpha;
-        myQueue -> rear = alpha;
-    }
-}
-
-int dequeue(Queue *myQueue) {
-    int x;
-
-    if ((myQueue -> front) == NULL) {
-        printf("Queue is empty.\n");
-        x = -1;
-    } else {
-        x = (myQueue -> front) -> data;
-        qNode *alpha = myQueue -> front;
-        myQueue -> front = (myQueue -> front) -> link;
-        free(alpha);
-    }
-
-    return x;
-}
-// *Queue Linked-List Implementation
-
 typedef struct Node {
     int succ;
     struct Node *next;
 } Node;
+
+void initQueue(Queue *);
+int isEmpty(Queue *);
+void enqueue(Queue *, int);
+int dequeue(Queue *);
+
+void topologicalSort(int);
+
+int main() {
+    int n;
+    if (scanf("%d", &n)) {};
+
+    topologicalSort(n);
+
+    return 0;
+}
 
 void topologicalSort(int n) {
     int *count;
@@ -347,26 +321,21 @@ void topologicalSort(int n) {
 
     // *Output objects.
     Node *alpha = NULL;
-    int k2;
-
     while (myQueue.front != NULL) {
         printf("%d ", myQueue.front -> data);
         m -= 1;
-        // printf("qqq%d\n", myQueue.front -> data);
         alpha = list[myQueue.front -> data];
 
         while (alpha != NULL) {
-            k2 = alpha -> succ;
-            count[k2] -= 1;
+            k = alpha -> succ;
+            count[k] -= 1;
 
-            if (count[k2] == 0) {
-                // printf("enqueue: %d\n", k2);
-                enqueue(&myQueue, k2);
+            if (count[k] == 0) {
+                enqueue(&myQueue, k);
             }
             alpha = alpha -> next;
         }
 
-        // myQueue.front = myQueue.front -> link;
         dequeue(&myQueue);
     }
     // *Output objects.
@@ -386,11 +355,43 @@ void topologicalSort(int n) {
     free(list);
 }
 
-int main() {
-    int n;
-    if (scanf("%d", &n)) {};
-
-    topologicalSort(n);
-
-    return 0;
+// Queue Linked-List Implementation
+void initQueue(Queue *myQueue) {
+    myQueue -> front = NULL;
+    myQueue -> rear = NULL;
 }
+
+int isEmpty(Queue *myQueue) {
+    return (myQueue -> front == NULL);
+}
+
+void enqueue(Queue *myQueue, int x) {
+    qNode *alpha = (qNode *) malloc(sizeof(qNode));
+    alpha -> data = x;
+    alpha -> link = NULL;
+
+    if ((myQueue -> front) == NULL) {
+        myQueue -> front = alpha;
+        myQueue -> rear = alpha;
+    } else {
+        (myQueue -> rear) -> link = alpha;
+        myQueue -> rear = alpha;
+    }
+}
+
+int dequeue(Queue *myQueue) {
+    int x;
+
+    if ((myQueue -> front) == NULL) {
+        printf("Queue is empty.\n");
+        x = -1;
+    } else {
+        x = (myQueue -> front) -> data;
+        qNode *alpha = myQueue -> front;
+        myQueue -> front = (myQueue -> front) -> link;
+        free(alpha);
+    }
+
+    return x;
+}
+// *Queue Linked-List Implementation

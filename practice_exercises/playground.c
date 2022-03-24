@@ -1,95 +1,121 @@
-// #include <stdio.h>
-// #include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
 
-// int main() {
-//     printf("test\n");
+typedef struct BInt {
+    int d;
+    struct BInt* ll;
+    struct BInt* rl;
+} BInt;
 
-//     int a = 12;
-//     int *p_a = &a;
+BInt * ctb(char *digits, int len) {
+    BInt *longInt = NULL;
+    BInt *tao = (BInt *) malloc(sizeof(BInt));
     
-//     printf("a: %d\n", a);
-//     printf("a: %p\n\n", p_a);
+    tao -> d = 0;
+    tao -> ll = tao;
+    tao -> rl = tao;
+    longInt = tao;
 
-//     printf("a: %d\n", *p_a);
-//     printf("a: %p", &a);
-// }
+    int nTerms = 0;
+    int sign = 1;
 
+    for (int i = 0; i < len; i++) {
+        int term = digits[i] - '0';
 
-#include <stdio.h> 
-#include <stdlib.h> 
+        tao = (BInt *) malloc(sizeof(BInt));
+        tao -> d = term;
+        (longInt -> ll) -> rl = tao;
+        tao -> rl = longInt;
+        tao -> ll = longInt -> ll;
+        longInt -> ll = tao;
 
-typedef int StackElemType;
-
-typedef struct stacknode StackNode;
-struct stacknode
-{ 
-	StackElemType INFO;
- 	StackNode *LINK;
-};
-
-struct stack
-{ 
-	StackNode *top;
-};
-typedef struct stack Stack;
-
-void InitStack(Stack *S) 
-{ 
-	S->top=NULL;
+        nTerms += 1;
+    }
+    
+    longInt -> d = sign * nTerms;
+    return longInt;
 }
 
-int IsEmptyStack(Stack *S)
-{ 
-	return(S->top==NULL);
+BInt * add(BInt **a_ptr, BInt **b_ptr) {
+    BInt *a = *a_ptr;
+    BInt *b = *b_ptr;
+
+    BInt *sum = NULL;
+    BInt *tao = (BInt *) malloc(sizeof(BInt));
+    
+    tao -> d = 0;
+    tao -> ll = tao;
+    tao -> rl = tao;
+    sum = tao;
+
+    int k = 0;
+    int c = 0;
+    BInt *alp = a -> ll;
+    BInt *beta = b -> ll;
+
+    int t = 0;
+    while (1) {
+        if ((alp != a) && (beta != b)) {
+            t = (alp -> d) + (beta -> d) + c;
+            alp = alp -> ll;
+            beta = beta -> ll;
+        }
+
+        if ((alp != a) && (beta == b)) {
+            t = (alp -> d) + c;
+            alp = alp -> ll;
+        }
+
+        if ((alp == a) && (beta != b)) {
+            t = (beta -> d) + c;
+            beta = beta -> ll;
+        }
+
+        if ((alp == a) && (beta == b)) {
+            if (c != 0) {
+                tao = (BInt *) malloc(sizeof(BInt));
+                tao -> d = c;
+                tao -> rl = sum -> rl;
+                tao -> ll = sum;
+                (sum -> rl) -> ll = tao;
+                sum -> rl = tao;
+
+                k += 1;
+            } else {
+                //
+            }
+
+            sum -> d = k;
+            break;
+        }
+
+        int term = t % 10;
+        tao = (BInt *) malloc(sizeof(BInt));
+        tao -> d = term;
+        tao -> rl = sum -> rl;
+        tao -> ll = sum;
+        (sum -> rl) -> ll = tao;
+        sum -> rl = tao;
+
+        c = t / 10;
+        k += 1;
+    }
+
+    return sum;
 }
 
-void StackOverflow(void)
-{ 
-	printf("Stack overflow detected.\n"); 
-	exit(1);
-}
+int main() {
+    char n1[10] = "123";
+    char n2[10] = "245";
 
-void StackUnderflow(void)
-{ 
-	printf("Stack underflow detected.\n"); 
-	exit(1);
-}
+    BInt *a = ctb(n1, 2);
+    BInt *b = ctb(n2, 2);
+    BInt *sum = add(&a, &b);
 
-void PUSH(Stack *S, StackElemType x)
-{ 
-	StackNode *alpha;
-	alpha = (StackNode *) malloc(sizeof(StackNode));
- 	if(alpha == NULL)
-		StackOverflow();
-	else {
-		alpha ->INFO = x;
-		alpha ->LINK = S ->top;
- 		S ->top = alpha;
- 	}
-}
+    for (int i = 0; i < 2; i++) {
+        sum = sum -> rl;
+        printf("%d ", sum -> d);
+    }
 
-void POP(Stack *S, StackElemType *x)
-{ 
-	StackNode *alpha;
- 	if(S->top == NULL)
-		StackUnderflow();
-	else {
-		alpha = S ->top;
-		*x = S ->top ->INFO;
-		S ->top = S ->top ->LINK;
- 		free(alpha);
- 	}
-}
-
-int main()
-{ 
-	// example procedure that uses a stack
-	Stack S; StackElemType x; int i; 
-	InitStack(&S);
-	for(i=1; i<=5; i++) PUSH(&S,100*i); 
-	while(!IsEmptyStack(&S)) {
-		POP(&S,&x);
-		printf("%d\n",x); 
-	} 
-	return 0;
+    return 0;
 }

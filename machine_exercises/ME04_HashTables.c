@@ -189,26 +189,92 @@ typedef struct HashTable {
     Stack **table;
 } HashTable;
 
-void initStack(Stack *myStack) {
-    myStack -> top = NULL;
-}
+void initStack(Stack *);
+void initHashTable(HashTable *);
+void push(Stack *, int, char *);
 
-void initHashTable(HashTable *myHashTable) {
-    myHashTable -> table = NULL;
-}
+int hashFunction(int, int);
+void displayHTable(HashTable *);
 
-void push(Stack *myStack, int key, char *data) {
-    Node *newNode = (Node *) malloc(sizeof(Node));
-    newNode -> key = key;
-    newNode -> data = data;
-    newNode -> link = NULL;
+void freeStack(Stack *);
+void freeHTable(HashTable *);
+void chainedHashTableInsert(HashTable *, int, char *, int);
 
-    if ((myStack -> top) == NULL) {
-        myStack -> top = newNode;
-    } else {
-        newNode -> link = myStack -> top;
-        myStack -> top = newNode;
+int main() {
+    int type;
+    if (scanf("%d", &type)) {}
+    int nStrInputs;
+    if (scanf("%d", &nStrInputs)) {}
+
+    // Initialize
+    HashTable myHashTable;
+    initHashTable(&myHashTable);
+
+    Stack **heads;
+    heads = (Stack **) malloc(32 * sizeof(Stack *));
+
+    for (int i = 0; i < 32; i++) {
+        Stack *myStack = (Stack *) malloc(sizeof(Stack));
+        initStack(myStack);
+
+        heads[i] = myStack;
     }
+    myHashTable.table = heads;
+
+    // Reference:
+    // https://pythontutor.com/c.html#code=int%20main%28%29%20%7B%0A%20%20char%20**strArray%3B%0A%20%20strArray%20%3D%20%28char%20**%29%20malloc%2810%20*%20sizeof%28char%20*%29%29%3B%0A%20%20%0A%20%20strArray%5B0%5D%20%3D%20%22qwerty%22%3B%0A%20%20strArray%5B5%5D%20%3D%20%22232hdf%22%3B%0A%0A%20%20free%28strArray%29%3B%0A%7D&curInstr=5&mode=display&origin=opt-frontend.js&py=c_gcc9.3.0&rawInputLstJSON=%5B%5D
+    char **strInputs;  // Store string inputs for later use.
+    strInputs = (char **) malloc(nStrInputs * sizeof(char *));
+
+    for (int i = 0; i < nStrInputs; i++) {
+        char *strTempInput = (char *) malloc(sizeof(char));
+        if (scanf("%s", strTempInput)) {};
+        strInputs[i] = strTempInput;
+
+        int key = 0;
+        int strLen = strlen(strInputs[i]);
+
+        // Calculate key.
+        for (int j = 0; j < strLen; j++) {
+            key += (int) strInputs[i][j];
+        }
+
+        chainedHashTableInsert(&myHashTable, key, strInputs[i], type);
+    }
+
+    displayHTable(&myHashTable);
+
+    // *Free manually allocated memories.
+    freeHTable(&myHashTable);
+    for (int i = 0; i < nStrInputs; i++) {
+        free(strInputs[i]);
+    }
+    free(strInputs);
+    // *Free manually allocated memories.
+
+    return 0;
+}
+
+void chainedHashTableInsert(HashTable *myHashTable, int key, char *data, int type) {
+    // **Search for possible duplicate key.
+    int index = hashFunction(type, key);
+    Stack *myStack = (myHashTable -> table)[index];
+    Node *alpha = myStack -> top;
+
+    while (alpha != NULL) {
+        int isDataEqual = strcmp(alpha -> data, data);  // Returns 0 when strings are equal.
+        if ((alpha -> key == key) && (isDataEqual == 0)) {
+            printf("Duplicate key found: %s\n", data);
+            return;
+        } else {
+            alpha = alpha -> link;
+        }
+    }
+    // **Search for possible duplicate key.
+
+    // **Insert new record at head of chain.
+    push(myStack, key, data);
+    // **Insert new record at head of chain.
 }
 
 int hashFunction(int type, int k) {
@@ -262,78 +328,26 @@ void freeHTable(HashTable *myHashTable) {
     };
 }
 
-void chainedHashTableInsert(HashTable *myHashTable, int key, char *data, int type) {
-    // **Search for possible duplicate key.
-    int index = hashFunction(type, key);
-    Stack *myStack = (myHashTable -> table)[index];
-    Node *alpha = myStack -> top;
-    printf("inputStr: %s | key: %d | index: %d\n", data, key, index);
-
-    while (alpha != NULL) {
-        int isDataEqual = strcmp(alpha -> data, data);  // Returns 0 when strings are equal.
-        if ((alpha -> key == key) && (isDataEqual == 0)) {
-            printf("Duplicate key found: %s\n", data);
-            return;
-        } else {
-            alpha = alpha -> link;
-        }
-    }
-    // **Search for possible duplicate key.
-
-    // **Insert new record at head of chain.
-    push(myStack, key, data);
-    // **Insert new record at head of chain.
+// *Stack implementation
+void initStack(Stack *myStack) {
+    myStack -> top = NULL;
 }
 
-int main() {
-    int type;
-    if (scanf("%d", &type)) {}
-    int nStrInputs;
-    if (scanf("%d", &nStrInputs)) {}
-
-    // Initialize
-    HashTable myHashTable;
-    initHashTable(&myHashTable);
-
-    Stack **heads;
-    heads = (Stack **) malloc(32 * sizeof(Stack *));
-
-    for (int i = 0; i < 32; i++) {
-        Stack *myStack = (Stack *) malloc(sizeof(Stack));
-        initStack(myStack);
-
-        heads[i] = myStack;
-    }
-    myHashTable.table = heads;
-
-    // Reference:
-    // https://pythontutor.com/c.html#code=int%20main%28%29%20%7B%0A%20%20char%20**strArray%3B%0A%20%20strArray%20%3D%20%28char%20**%29%20malloc%2810%20*%20sizeof%28char%20*%29%29%3B%0A%20%20%0A%20%20strArray%5B0%5D%20%3D%20%22qwerty%22%3B%0A%20%20strArray%5B5%5D%20%3D%20%22232hdf%22%3B%0A%0A%20%20free%28strArray%29%3B%0A%7D&curInstr=5&mode=display&origin=opt-frontend.js&py=c_gcc9.3.0&rawInputLstJSON=%5B%5D
-    char **strInputs;
-    strInputs = (char **) malloc(nStrInputs * sizeof(char *));
-
-    for (int i = 0; i < nStrInputs; i++) {
-        char *strTempInput = (char *) malloc(sizeof(char));
-        if (scanf("%s", strTempInput)) {};
-        strInputs[i] = strTempInput;
-        int key = 0;
-        int strLen = strlen(strInputs[i]);
-
-        for (int j = 0; j < strLen; j++) {
-            key += (int) strInputs[i][j];
-        }
-
-        chainedHashTableInsert(&myHashTable, key, strInputs[i], type);
-    }
-
-    
-
-    displayHTable(&myHashTable);
-    freeHTable(&myHashTable);
-    for (int i = 0; i < nStrInputs; i++) {
-        free(strInputs[i]);
-    }
-    free(strInputs);
-
-    return 0;
+void initHashTable(HashTable *myHashTable) {
+    myHashTable -> table = NULL;
 }
 
+void push(Stack *myStack, int key, char *data) {
+    Node *newNode = (Node *) malloc(sizeof(Node));
+    newNode -> key = key;
+    newNode -> data = data;
+    newNode -> link = NULL;
+
+    if ((myStack -> top) == NULL) {
+        myStack -> top = newNode;
+    } else {
+        newNode -> link = myStack -> top;
+        myStack -> top = newNode;
+    }
+}
+// *Stack implementation

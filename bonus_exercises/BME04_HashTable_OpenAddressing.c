@@ -70,24 +70,10 @@
 #define tableSize 256
 #define newLine printf("\n")
 
-int getHashFunction1(int key) {
-    return key % tableSize;
-}
-
-int getHashFunction2(int key) {
-    return (((1731 * key + 520123) % 524287) % tableSize) | 1;
-}
-
-int getMainHashFunction(int key, int i) {
-    return (getHashFunction1(key) + (i * getHashFunction2(key))) % tableSize;
-}
-
-void displayHashTable(int hashTable[tableSize]) {
-    for (int i = 0; i < tableSize; i++) {
-        printf("%d: %d", i, hashTable[i]);
-        newLine;
-    }
-}
+int getMainHashFunction(int, int);
+int getHashFunction1(int);
+int getHashFunction2(int);
+void displayHashTable(int[tableSize]);
 
 int main() {
     int hashTable[tableSize];
@@ -125,4 +111,23 @@ int main() {
     printf("%d\n", collissionCounter);
 
     return 0;
+}
+
+int getMainHashFunction(int key, int i) {
+    return (getHashFunction1(key) + (i * getHashFunction2(key))) % tableSize;
+}
+
+int getHashFunction1(int key) {
+    return key % tableSize;
+}
+
+int getHashFunction2(int key) {
+    return (((1731 * key + 520123) % 524287) % tableSize) | 1;
+}
+
+void displayHashTable(int hashTable[tableSize]) {
+    for (int i = 0; i < tableSize; i++) {
+        printf("%d: %d", i, hashTable[i]);
+        newLine;
+    }
 }

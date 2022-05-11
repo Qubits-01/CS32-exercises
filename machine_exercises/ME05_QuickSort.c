@@ -2,7 +2,22 @@
 #include <stdlib.h>
 
 #define arrSize 8
+#define prime 13
 #define newLine printf("\n")
+
+void displayArr(int myArr[]) {
+    for (int i = 0; i < arrSize; i++) {
+        printf("%d ", myArr[i]);
+    }
+    newLine;
+}
+
+void displayArrWithRange(int myArr[], int left, int right) {
+    for (;left < right; left++) {
+        printf("%d ", myArr[left]);
+    }
+    newLine;
+}
 
 int partition(int A[], int p, int r) {
     int x = A[r];
@@ -21,6 +36,8 @@ int partition(int A[], int p, int r) {
     A[i + 1] = A[r];
     A[r] = temp;
 
+    displayArrWithRange(A, p, r + 1);
+    
     return i + 1;
 }
 
@@ -32,18 +49,29 @@ void quicksort(int A[], int p, int r) {
     }
 }
 
+
+void shuffleArr(int newArr[], int oldArr[]) {
+    int newIndices[arrSize];
+    for (int i = 0; i < arrSize; i++) {
+        newIndices[i] = ((i + 1) * prime) % arrSize;
+    }
+
+    for (int i = 0; i < arrSize; i++) {
+        newArr[i] = oldArr[newIndices[i]];
+    }
+}
+
 int main() {
     int arr[arrSize] = {3, 2, 5, 6, 8, 4, 7, 1};
     int p = 0;
     int r = arrSize - 1;
 
-    quicksort(arr, p, r);
+    int newArr[arrSize];
+    shuffleArr(newArr, arr);
+    displayArr(newArr);
 
-    for (int i = 0; i < arrSize; i++) {
-        printf("%d ", arr[i]);
-    }
-    newLine;
-
+    quicksort(newArr, p, r);
+    displayArr(newArr);
 
     return 0;
 }

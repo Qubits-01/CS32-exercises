@@ -1,65 +1,48 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<math.h>
 
-#define newLine printf("\n");
+int quick_select(int[], int, int, int);
+int median_partition(int[], int, int);
+int median_of_medians(int[], int, int);
 
-int ceilDiv(int numerator, int denominator) {
-    int floorQuotient = numerator / denominator;
-    int ceilQuotient;
+void insertion_sort(int[], int, int);
+int ceilDiv(int, int);
 
-    if (numerator > (floorQuotient * denominator)) {
-        ceilQuotient = floorQuotient + 1;
-    } else {
-        ceilQuotient = floorQuotient;
-    }
+int main(){
+	int T, M;
+	if (scanf("%d", &T)) {};
+	
+	while(T-- > 0){
+		if (scanf("%d", &M)) {};
+		int arr[M];
 
-    return ceilQuotient;
+		//read the elements of the input array
+		for(int i=0; i<M; i++) if (scanf("%d", &arr[i])) {};
+        
+		int median_index = ((M + 1) / 2);
+		printf("Median: %d\n", quick_select(arr, 0, M - 1, median_index));
+	}
+	
+	return 0;
 }
 
-void insertion_sort(int A[], int from, int to) {
-  for (int step = from + 1; step < to; step++) {
-    int key = A[step];
-    int j = step - 1;
-    
-    while ((key < A[j]) && (j >= 0)) {
-      A[j + 1] = A[j];
-      --j;
-    }
-    
-    A[j + 1] = key;
-  }
-}
-
-int quick_select(int A[], int p, int r, int k);
-
-int median_of_medians(int A[], int p, int r){
+int quick_select(int A[], int p, int r, int rank) {
 	// Write your code here
-    int noOfGroups =  ceilDiv((r - p) + 1, 5);
-    int medians[noOfGroups];
-    int mediansIndex = 0;
+    if (p == r) return A[p];
 
-    int tempGroup[5];
-    int tempGroupIndex = 0;
-    
-    for (int i = p; i <= r; i++) {
-        tempGroup[tempGroupIndex] = A[i];
-        tempGroupIndex++;
+    int q = median_partition(A, p, r);
+    int k = q - p + 1;
 
-        if ((tempGroupIndex == 5) || (i == r)) {
-            insertion_sort(tempGroup, 0, tempGroupIndex);
-
-            medians[mediansIndex] = tempGroup[((tempGroupIndex + 1) / 2) - 1];
-            mediansIndex++;
-
-            tempGroupIndex = 0;
-        }
+    if (rank == k) {
+        return A[q];
+    } else if (rank < k) {
+        return quick_select(A, p, q - 1, rank);
+    } else {
+        return quick_select(A, q + 1, r, rank - k);
     }
-
-    return quick_select(medians, 0, noOfGroups - 1, (noOfGroups + 1) / 2);
 }
 
-int median_partition(int A[], int p, int r){
+int median_partition(int A[], int p, int r) {
 	// Write your code here
     int median = median_of_medians(A, p, r);
 
@@ -95,36 +78,55 @@ int median_partition(int A[], int p, int r){
     return i + 1;
 }
 
-int quick_select(int A[], int p, int r, int rank){
+int median_of_medians(int A[], int p, int r) {
 	// Write your code here
-    if (p == r) return A[p];
+    int noOfGroups =  ceilDiv((r - p) + 1, 5);
+    int medians[noOfGroups];
+    int mediansIndex = 0;
 
-    int q = median_partition(A, p, r);
-    int k = q - p + 1;
+    int tempGroup[5];
+    int tempGroupIndex = 0;
+    
+    for (int i = p; i <= r; i++) {
+        tempGroup[tempGroupIndex] = A[i];
+        tempGroupIndex++;
 
-    if (rank == k) {
-        return A[q];
-    } else if (rank < k) {
-        return quick_select(A, p, q - 1, rank);
-    } else {
-        return quick_select(A, q + 1, r, rank - k);
+        if ((tempGroupIndex == 5) || (i == r)) {
+            insertion_sort(tempGroup, 0, tempGroupIndex);
+
+            medians[mediansIndex] = tempGroup[((tempGroupIndex + 1) / 2) - 1];
+            mediansIndex++;
+
+            tempGroupIndex = 0;
+        }
     }
+
+    return quick_select(medians, 0, noOfGroups - 1, (noOfGroups + 1) / 2);
 }
 
-int main(){
-	int T, M;
-	if (scanf("%d", &T)) {};
-	
-	while(T-- > 0){
-		if (scanf("%d", &M)) {};
-		int arr[M];
+void insertion_sort(int A[], int from, int to) {
+  for (int step = from + 1; step < to; step++) {
+    int key = A[step];
+    int j = step - 1;
+    
+    while ((key < A[j]) && (j >= 0)) {
+      A[j + 1] = A[j];
+      --j;
+    }
+    
+    A[j + 1] = key;
+  }
+}
 
-		//read the elements of the input array
-		for(int i=0; i<M; i++) if (scanf("%d", &arr[i])) {};
-        
-		int median_index = ((M + 1) / 2);
-		printf("Median: %d\n", quick_select(arr, 0, M - 1, median_index));
-	}
-	
-	return 0;
+int ceilDiv(int numerator, int denominator) {
+    int floorQuotient = numerator / denominator;
+    int ceilQuotient;
+
+    if (numerator > (floorQuotient * denominator)) {
+        ceilQuotient = floorQuotient + 1;
+    } else {
+        ceilQuotient = floorQuotient;
+    }
+
+    return ceilQuotient;
 }
